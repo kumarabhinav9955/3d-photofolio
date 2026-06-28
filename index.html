@@ -6,17 +6,21 @@
 -->
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a1a" />
   <title>Kumar Abhinav · 3D Portfolio</title>
-  <meta name="description" content="Kumar Abhinav — Software Engineer. Interactive 3D portfolio showcasing skills, education and work." />
+  <meta name="description"
+    content="Kumar Abhinav — Software Engineer. Interactive 3D portfolio showcasing skills, education and work." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,14 +31,599 @@
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
   <!-- ───────── LOADER ───────── -->
   <div id="loader" aria-hidden="true">
     <div class="loader-cube">
-      <div class="face f1"></div><div class="face f2"></div><div class="face f3"></div>
-      <div class="face f4"></div><div class="face f5"></div><div class="face f6"></div>
+      <div class="face f1"></div>
+      <div class="face f2"></div>
+      <div class="face f3"></div>
+      <div class="face f4"></div>
+      <div class="face f5"></div>
+      <div class="face f6"></div>
     </div>
+    <p class="loader-text">INITIALIZING&nbsp;<span>3D&nbsp;SPACE</span></p>
+  </div>
+
+  <!-- ───────── CUSTOM 3D CURSOR ───────── -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- ───────── BACKGROUND CANVAS (particle galaxy) ───────── -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- ───────── NAV ───────── -->
+  <nav class="navbar navbar-expand-lg fixed-top glass-nav">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#home">
+        <span class="brand-mark">KA</span>
+        <span class="brand-text">Kumar&nbsp;Abhinav</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
+          <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+          <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
+          <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+          <li class="nav-item"><a class="nav-link btn-cta" href="#contact">Let's&nbsp;Talk</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ───────── HERO ───────── -->
+  <section id="home" class="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="container hero-inner">
+      <div class="row align-items-center">
+        <div class="col-lg-6 hero-copy">
+          <p class="eyebrow"><span class="pulse-dot"></span> Available for new opportunities</p>
+          <h1 class="display-3 fw-bold lh-1">
+            Hi, I'm <span class="grad-text">Kumar&nbsp;Abhinav</span>
+          </h1>
+          <h2 class="hero-sub">
+            I build
+            <span class="rotator">
+              <span>scalable web apps.</span>
+              <span>3D experiences.</span>
+              <span>clean APIs.</span>
+              <span>delightful UIs.</span>
+            </span>
+          </h2>
+          <p class="lead text-soft mt-3">
+            Software Engineer at <strong>GSPANN Technologies</strong>. I love turning ideas
+            into interactive products — from backend systems to immersive front-ends.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a href="#projects" class="btn btn-primary btn-3d">
+              <i class="bi bi-rocket-takeoff me-2"></i>View My Work
+            </a>
+            <a href="#contact" class="btn btn-outline-glow">
+              <i class="bi bi-chat-dots me-2"></i>Contact Me
+            </a>
+          </div>
+          <div class="hero-socials mt-4">
+            <a href="https://www.linkedin.com/in/kumar-abhinav-a32815179/" target="_blank" rel="noopener"
+              aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <!-- [EDIT] add your real links below -->
+            <a href="https://github.com/kumarabhinav9955" aria-label="GitHub"><i class="bi bi-github"></i></a>
+            <a href="mailto:kumarabhinavwork002@gmail.com" aria-label="Email"><i class="bi bi-envelope-at"></i></a>
+            <a href="https://www.instagram.com/kumar_abhinav__?igsh=bTdvY3gwdG5lZm1w" aria-label="Instagram"><i
+                class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-6 d-none d-lg-block">
+          <!-- the canvas behind absorbs this column for the 3D head/icosahedron -->
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <span class="mouse"><span class="wheel"></span></span>
+        <small>scroll</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── ABOUT ───────── -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-5" data-aos="fade-right">
+          <div class="avatar-3d">
+            <canvas id="avatar-canvas"></canvas>
+            <div class="avatar-glow"></div>
+          </div>
+        </div>
+        <div class="col-lg-7" data-aos="fade-left">
+          <p class="section-eyebrow">// about</p>
+          <h2 class="section-title">A developer who <span class="grad-text">ships</span>.</h2>
+          <p class="text-soft">
+            I'm a software engineer based in India, currently building enterprise solutions
+            at <strong>GSPANN Technologies</strong>. My passion sits at the intersection of
+            clean backend architecture and engaging front-end experiences — which is why
+            this portfolio itself is rendered in real-time WebGL.
+          </p>
+          <p class="text-soft">
+            Outside work I explore generative art, contribute to open source, and obsess
+            over the smallest details of UX.
+          </p>
+
+          <div class="row g-3 mt-2">
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <h3>1<span>+</span></h3>
+                <p>Years exp.</p>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <h3>15<span>+</span></h3>
+                <p>Projects</p>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <h3>15<span>+</span></h3>
+                <p>Tech stacks</p>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <h3>∞</h3>
+                <p>Coffees</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── EDUCATION (3D timeline) ───────── -->
+  <section id="education" class="section section-alt">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <p class="section-eyebrow">// education</p>
+        <h2 class="section-title">Academic <span class="grad-text">Journey</span></h2>
+      </div>
+
+      <div class="timeline-3d">
+        <!-- [EDIT] replace dates / institutions / courses with real LinkedIn data -->
+        <div class="t-item" data-aos="fade-up">
+          <div class="t-node"><i class="bi bi-mortarboard-fill"></i></div>
+          <div class="t-card tilt">
+            <span class="t-year">2020 — 2024</span>
+            <h4>Bachelor of Technology (B.Tech)</h4>
+            <p class="t-org">Computer Science &amp; Engineering</p>
+            <p class="text-soft small">
+              Graduated with focus on software engineering, data structures &amp; algorithms,
+              and distributed systems. Active in coding clubs and hackathons.
+            </p>
+          </div>
+        </div>
+
+        <div class="t-item right" data-aos="fade-up">
+          <div class="t-node"><i class="bi bi-book-half"></i></div>
+          <div class="t-card tilt">
+            <span class="t-year">2019 — 2020</span>
+            <h4>Delhi State Open School (12th)</h4>
+            <p class="t-org">Science · PCM</p>
+            <p class="text-soft small">
+              Physics, Chemistry &amp; Mathematics — built the analytical foundation
+              that still guides my problem-solving today.
+            </p>
+          </div>
+        </div>
+
+        <div class="t-item" data-aos="fade-up">
+          <div class="t-node"><i class="bi bi-journal-code"></i></div>
+          <div class="t-card tilt">
+            <span class="t-year">2017-2017</span>
+            <h4>DAV NANDRAJ PUBLIC SCHOOL</h4>
+            <p class="t-org">CLASS 10TH</p>
+            <p class="text-soft small">
+              Completed my secondary education with a focus on core subjects and
+              extracurricular activities that nurtured my curiosity in technology.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── SKILLS (orbit sphere) ───────── -->
+  <section id="skills" class="section">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <p class="section-eyebrow">// skills</p>
+        <h2 class="section-title">Tech I <span class="grad-text">Orbit</span> Around</h2>
+        <p class="text-soft">Hover the sphere — it follows your cursor.</p>
+      </div>
+
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-6" data-aos="zoom-in">
+          <div class="skills-orb">
+            <canvas id="skills-canvas"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <div class="skill-group">
+            <h5>Languages</h5>
+            <div class="chips">
+              <span>JavaScript</span><span>TypeScript</span><span>Java</span>
+              <span>Python</span><span>SQL</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h5>Frontend</h5>
+            <div class="chips">
+              <span>React</span><span>Next.js</span><span>Bootstrap</span>
+              <span>Three.js</span><span>GSAP</span><span>HTML5 / CSS3</span>
+              <span>AEM</span><span>Builder.io</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h5>Backend &amp; Cloud</h5>
+            <div class="chips">
+              <span>Node.js</span><span>Spring Boot</span><span>REST APIs</span>
+              <span>MongoDB</span><span>PostgreSQL</span><span>AWS</span><span>Docker</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h5>Tooling</h5>
+            <div class="chips">
+              <span>Git</span><span>CI/CD</span><span>Jest</span><span>Figma</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── EXPERIENCE ───────── -->
+  <section id="experience" class="section section-alt">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <p class="section-eyebrow">// experience</p>
+        <h2 class="section-title">Where I've <span class="grad-text">Worked</span></h2>
+      </div>
+
+      <div class="row g-4">
+        <!-- [EDIT] dates / titles -->
+        <div class="col-md-6" data-aos="fade-up">
+          <div class="exp-card tilt">
+            <div class="exp-header">
+              <div class="exp-logo"><i class="bi bi-buildings"></i></div>
+              <div>
+                <h4>Associate Software Engineer</h4>
+                <p class="text-soft mb-0">GSPANN Technologies, Inc · 2025 - Present</p>
+              </div>
+            </div>
+            <ul class="exp-list">
+              <li>Developed and maintained enterprise web applications using Adobe Experience Manager (AEM), building
+                reusable components, templates, Sling Models, and backend services with Java.</li>
+
+              <li>Implemented AEM features by integrating REST APIs, managing content with Builder.io, optimizing
+                application performance, and supporting frontend development using HTML, React, and JavaScript.</li>
+
+              <li>Collaborated with cross-functional teams in Agile sprints using Jira and Git, participated in code
+                reviews, debugging, testing, and deployment of scalable, production-ready applications on AWS.</li>
+            </ul>
+            <div class="chips small">
+              <span>AEM</span><span>Java</span><span>Sling Models</span><span>OSGi</span>
+              <span>HTL (Sightly)</span><span>JCR</span><span>Editable Templates</span>
+              <span>AEM Components</span>
+              <span>Content Fragments</span>
+              <span>Experience Fragments</span>
+              <span>HTML</span>
+              <span>CSS</span>
+              <span>JavaScript</span>
+              <span>React</span>
+              <span>Node.js</span>
+              <span>Spring Boot</span>
+              <span>REST APIs</span>
+              <span>Builder.io</span>
+              <span>AWS</span>
+              <span>Git</span>
+              <span>Maven</span>
+              <span>Agile</span>
+              <span>Jira</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="exp-card tilt">
+            <div class="exp-header">
+              <div class="exp-logo"><i class="bi bi-person-lines-fill"></i></div>
+              <div>
+                <h4>Software Engineer Trainee</h4>
+                <p class="text-soft mb-0">GSPANN Technologies, Inc · 2025 - 2026</p>
+              </div>
+            </div>
+            <ul class="exp-list">
+              <li>Contributed to full-stack development of enterprise web applications using Adobe Experience Manager
+                (AEM), Java, Sling, OSGi, and HTL (Sightly).</li>
+
+              <li>Developed and maintained AEM Components, Templates, Dialogs, Client Libraries, and Servlets while
+                integrating REST APIs, implementing feature enhancements, performance optimizations, and bug fixes
+                across frontend and backend.</li>
+
+              <li>Collaborated with senior engineers in Agile sprints, participating in code reviews, Git-based version
+                control, testing, debugging, and deployment of production-ready applications.</li>
+            </ul>
+            <div class="chips small">
+              <span>Java</span><span>HTML</span><span>React</span><span>AWS</span><span>REST
+                APIs</span><span>Git</span><span>Agile</span><span>Jira</span><span>Sling
+                Models</span><span>Builder.io</span><span>Node.js</span><span>Spring
+                Boot</span><span>AEM</span><span>OSGi</span><span>HTL</span><span>Client
+                Libraries</span><span>Servlets</span><span><span>Code Reviews</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="exp-card tilt">
+            <div class="exp-header">
+              <div class="exp-logo"><i class="bi bi-code-slash"></i></div>
+              <div>
+                <h4>Internship Trainee</h4>
+                <p class="text-soft mb-0">GSPANN Technologies, Inc · 2024 - 2025</p>
+              </div>
+            </div>
+            <ul class="exp-list">
+              <li>Developed and maintained responsive web applications using HTML5, CSS3, JavaScript, and MEAN Stack
+                technologies.</li>
+              <li>Collaborated with team members to design, develop, and test full-stack applications, ensuring
+                functionality and performance optimization.</li>
+              <li>Gained hands-on experience in MongoDB, Express.js, Angular, and Node.js, while applying software
+                development best practices and debugging techniques.</li>
+            </ul>
+            <div class="chips small">
+              <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── PROJECTS ───────── -->
+  <section id="projects" class="section">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <p class="section-eyebrow">// projects</p>
+        <h2 class="section-title">Selected <span class="grad-text">Work</span></h2>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-1"><span class="float-emoji">�</span></div>
+            <h5>Snake Game</h5>
+            <p class="text-soft small">Classic snake game with smooth controls and scoring system. Most popular project
+              with 5+ stars!</p>
+            <div class="chips small"><span>JavaScript</span><span>HTML5</span><span>CSS</span></div>
+            <a href="https://github.com/kumarabhinav9955/snake-game-" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-2"><span class="float-emoji">📱</span></div>
+            <h5>Android Task Reminder</h5>
+            <p class="text-soft small">Full-featured Android app with SQL database, notifications, and clean UI using
+              Android Studio.</p>
+            <div class="chips small"><span>Java</span><span>Android</span><span>SQL</span></div>
+            <a href="https://github.com/kumarabhinav9955/Android-Task-Reminder-App-" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-3"><span class="float-emoji">🌤️</span></div>
+            <h5>Weather Update App</h5>
+            <p class="text-soft small">Real-time weather app with API integration, responsive design, and location-based
+              forecasts.</p>
+            <div class="chips small"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+            <a href="https://github.com/kumarabhinav9955/Weather_update" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-4"><span class="float-emoji">🏓</span></div>
+            <h5>Ping Pong Ball Game</h5>
+            <p class="text-soft small">Interactive ping pong game with smooth animations and 2-player mode. 3+ GitHub
+              stars.</p>
+            <div class="chips small"><span>JavaScript</span><span>Canvas</span><span>HTML5</span></div>
+            <a href="https://github.com/kumarabhinav9955/Ping_pong_ball_game" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-5"><span class="float-emoji">🤖</span></div>
+            <h5>Gemini Clone</h5>
+            <p class="text-soft small">AI-powered chat interface inspired by Google Gemini with modern UI and API
+              integration.</p>
+            <div class="chips small"><span>React</span><span>JavaScript</span><span>API</span></div>
+            <a href="https://github.com/kumarabhinav9955/Gemini-clone" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-6"><span class="float-emoji">🔐</span></div>
+            <h5>Password Manager</h5>
+            <p class="text-soft small">Secure password manager with encryption, local storage, and password strength
+              validation.</p>
+            <div class="chips small"><span>JavaScript</span><span>LocalStorage</span><span>Crypto</span></div>
+            <a href="https://github.com/kumarabhinav9955/Password_Manager" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-1"><span class="float-emoji">🎤</span></div>
+            <h5>Virtual Assistant</h5>
+            <p class="text-soft small">Voice-powered virtual assistant with speech recognition and text-to-speech
+              capabilities.</p>
+            <div class="chips small"><span>JavaScript</span><span>Web Speech API</span></div>
+            <a href="https://github.com/kumarabhinav9955/Virtual-Assistance-" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-2"><span class="float-emoji">🛒</span></div>
+            <h5>KA Shopping Website</h5>
+            <p class="text-soft small">E-commerce platform with product catalog, cart functionality, and responsive
+              design.</p>
+            <div class="chips small"><span>JavaScript</span><span>Bootstrap</span><span>CSS</span></div>
+            <a href="https://github.com/kumarabhinav9955/KA-Shoping-Website" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-3"><span class="float-emoji">🎯</span></div>
+            <h5>Quiz Application</h5>
+            <p class="text-soft small">Interactive quiz app with timer, score tracking, and multiple question types.</p>
+            <div class="chips small"><span>JavaScript</span><span>HTML</span><span>CSS</span></div>
+            <a href="https://github.com/kumarabhinav9955/Java-JavaScript-HTML-CSS-Quiz-App" target="_blank"
+              rel="noopener" class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-4"><span class="float-emoji">🔑</span></div>
+            <h5>Random Password Generator</h5>
+            <p class="text-soft small">Generate secure passwords with customizable length and character options.</p>
+            <div class="chips small"><span>JavaScript</span><span>CSS</span><span>HTML</span></div>
+            <a href="https://github.com/kumarabhinav9955/Random-Password-Generator" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-5"><span class="float-emoji">❌⭕</span></div>
+            <h5>Tic-Tac-Toe Game</h5>
+            <p class="text-soft small">Classic tic-tac-toe game with clean UI and win detection algorithm.</p>
+            <div class="chips small"><span>JavaScript</span><span>HTML5</span><span>CSS3</span></div>
+            <a href="https://github.com/kumarabhinav9955/Tic-Tac-Game" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <article class="project-card tilt">
+            <div class="project-thumb thumb-6"><span class="float-emoji">📅</span></div>
+            <h5>Appointment System</h5>
+            <p class="text-soft small">Complete appointment booking system with scheduling, reminders, and admin
+              dashboard.</p>
+            <div class="chips small"><span>JavaScript</span><span>Node.js</span><span>MongoDB</span></div>
+            <a href="https://github.com/kumarabhinav9955/Appointment-Management-System" target="_blank" rel="noopener"
+              class="project-link">View →</a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── CONTACT ───────── -->
+  <section id="contact" class="section section-alt">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6" data-aos="fade-right">
+          <p class="section-eyebrow">// contact</p>
+          <h2 class="section-title">Let's <span class="grad-text">build</span> something.</h2>
+          <p class="text-soft">
+            Whether it's a freelance gig, a full-time role, or a curious "hello",
+            my inbox is open. I'll get back to you within a day or two.
+          </p>
+          <ul class="contact-list">
+            <li><i class="bi bi-envelope-fill"></i> <a
+                href="mailto:kumarabhinavwork002@gmail.com">kumarabhinavwork002@gmail.com</a> <span
+                class="text-soft"></span></li>
+            <li><i class="bi bi-linkedin"></i> <a href="https://www.linkedin.com/in/kumar-abhinav-a32815179/"
+                target="_blank" rel="noopener">linkedin.com/in/kumar-abhinav</a></li>
+            <li><i class="bi bi-geo-alt-fill"></i> India</li>
+          </ul>
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-left">
+          <form id="contact-form" class="glass-form">
+            <!-- Web3Forms Access Key - Get yours at https://web3forms.com -->
+            <input type="hidden" name="access_key" value="6ef395ad-5643-4f7b-8800-8abf10ef199b">
+            <input type="hidden" name="subject" value="New Contact from Portfolio">
+            <input type="hidden" name="redirect" value="false">
+
+            <div class="mb-3">
+              <label class="form-label">Your name</label>
+              <input type="text" name="name" class="form-control" placeholder="Jane Doe" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="jane@company.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea name="message" class="form-control" rows="4" placeholder="Tell me about your idea…"
+                required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-3d w-100">
+              <i class="bi bi-send-fill me-2"></i> <span class="btn-text">Send Message</span>
+            </button>
+            <p id="form-msg" class="mt-3" style="display: none;"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer class="footer">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <p class="mb-0 small text-soft">© <span id="year"></span> Kumar Abhinav · Crafted with Three.js &amp; ☕</p>
+      <div class="hero-socials sm">
+        <a href="https://www.linkedin.com/in/kumar-abhinav-a32815179/" target="_blank" rel="noopener"><i
+            class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/kumarabhinav9955" target="_blank" rel="noopener"><i class="bi bi-github"></i></a>
+        <a href="mailto:kumarabhinavwork002@gmail.com" target="_blank" rel="noopener"><i
+            class="bi bi-envelope-at"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ───────── LIBRARIES ───────── -->
+  <script type="importmap">
+  { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+
+</html>    </div>
     <p class="loader-text">INITIALIZING&nbsp;<span>3D&nbsp;SPACE</span></p>
   </div>
 
