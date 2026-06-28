@@ -1,5 +1,6 @@
-# Kumar Abhinav — 3D Portfolio  
+# Kumar Abhinav — 3D Portfolio    
 
+Preview link: https://3d-photofolio.vercel.app/
 A unique, single-page **static 3D portfolio website** built with HTML, Bootstrap 5, custom CSS, and Three.js. Everything is rendered in real-time WebGL — no images required.
 
 ## ✨ What makes it unique
