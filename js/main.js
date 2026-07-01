@@ -207,20 +207,63 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
   );
   group.add(orb);
 
-  // Orbiting small spheres
+  // Orbiting small spheres (increased count and variety)
   const orbiters = [];
-  const colors = [0xff5ca7, 0x00e5ff, 0xffffff];
-  for (let i = 0; i < 3; i++) {
-    const m = new THREE.Mesh(
+  const colors = [0xff5ca7, 0x00e5ff, 0xffffff, 0x7c5cff, 0xffd700];
+  for (let i = 0; i < 6; i++) {
+    const geoms = [
       new THREE.SphereGeometry(0.08, 24, 24),
-      new THREE.MeshBasicMaterial({ color: colors[i] })
+      new THREE.OctahedronGeometry(0.08),
+      new THREE.TetrahedronGeometry(0.09),
+      new THREE.BoxGeometry(0.12, 0.12, 0.12)
+    ];
+    const m = new THREE.Mesh(
+      geoms[i % geoms.length],
+      new THREE.MeshStandardMaterial({ 
+        color: colors[i % colors.length],
+        metalness: 0.8,
+        roughness: 0.2,
+        emissive: colors[i % colors.length],
+        emissiveIntensity: 0.3
+      })
     );
-    m.userData.angle  = (i / 3) * Math.PI * 2;
-    m.userData.radius = 2.1 + i * 0.15;
-    m.userData.speed  = 0.5 + i * 0.3;
-    m.userData.tilt   = (i - 1) * 0.4;
+    m.userData.angle  = (i / 6) * Math.PI * 2;
+    m.userData.radius = 2.2 + (i % 3) * 0.2;
+    m.userData.speed  = 0.4 + i * 0.2;
+    m.userData.tilt   = (i - 2.5) * 0.35;
+    m.userData.rotSpeed = (Math.random() - 0.5) * 0.05;
     group.add(m);
     orbiters.push(m);
+  }
+
+  // Add floating geometric shapes around the main object
+  const floatingShapes = [];
+  for (let i = 0; i < 8; i++) {
+    const shapes = [
+      new THREE.TorusGeometry(0.15, 0.05, 16, 32),
+      new THREE.ConeGeometry(0.08, 0.25, 8),
+      new THREE.DodecahedronGeometry(0.1)
+    ];
+    const shape = new THREE.Mesh(
+      shapes[i % shapes.length],
+      new THREE.MeshPhongMaterial({
+        color: colors[i % colors.length],
+        transparent: true,
+        opacity: 0.4,
+        wireframe: i % 2 === 0
+      })
+    );
+    const angle = (i / 8) * Math.PI * 2;
+    shape.position.set(
+      Math.cos(angle) * 3,
+      (Math.random() - 0.5) * 2,
+      Math.sin(angle) * 3
+    );
+    shape.userData.baseY = shape.position.y;
+    shape.userData.floatSpeed = 0.001 + Math.random() * 0.002;
+    shape.userData.floatPhase = Math.random() * Math.PI * 2;
+    group.add(shape);
+    floatingShapes.push(shape);
   }
 
   // Lights
@@ -251,6 +294,16 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
       m.position.x = Math.cos(a) * m.userData.radius;
       m.position.z = Math.sin(a) * m.userData.radius;
       m.position.y = Math.sin(a * 2) * m.userData.tilt;
+      // Add individual rotation
+      m.rotation.x += m.userData.rotSpeed;
+      m.rotation.y += m.userData.rotSpeed * 0.7;
+    });
+
+    // Animate floating shapes
+    floatingShapes.forEach(shape => {
+      shape.rotation.x += 0.01;
+      shape.rotation.y += 0.015;
+      shape.position.y = shape.userData.baseY + Math.sin(t * shape.userData.floatSpeed * 1000 + shape.userData.floatPhase) * 0.5;
     });
 
     group.rotation.y += (ptr.x * 0.5 - group.rotation.y) * 0.04;
@@ -275,7 +328,7 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
 })();
 
 /* ============================================================
-   SCENE 3 — About canvas: morphing torus knot
+   SCENE 3 — About canvas: DNA Double Helix
    ============================================================ */
 (function avatarScene() {
   const canvas = document.getElementById('avatar-canvas');
@@ -283,7 +336,7 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
 
   const scene  = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-  camera.position.set(0, 0, 4.5);
+  camera.position.set(0, 0, 5.5);
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -297,35 +350,151 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
   resize();
   window.addEventListener('resize', resize);
 
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x7c5cff,
-    metalness: 0.7,
-    roughness: 0.15,
-    emissive: 0x14043c,
-    emissiveIntensity: 0.8,
-    wireframe: false,
-  });
-  const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1, 0.34, 180, 28), mat);
-  scene.add(knot);
+  // Create DNA helix structure
+  const group = new THREE.Group();
+  scene.add(group);
+  
+  const helixPoints = [];
+  const segments = 40;
+  const height = 3.5;
+  const radius = 0.8;
+  
+  // Create two helical strands
+  for (let i = 0; i < segments; i++) {
+    const t = (i / segments) * Math.PI * 4;
+    const y = (i / segments) * height - height / 2;
+    
+    // Strand 1
+    const sphere1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08, 16, 16),
+      new THREE.MeshStandardMaterial({
+        color: 0x00e5ff,
+        metalness: 0.7,
+        roughness: 0.2,
+        emissive: 0x00e5ff,
+        emissiveIntensity: 0.4
+      })
+    );
+    sphere1.position.set(
+      Math.cos(t) * radius,
+      y,
+      Math.sin(t) * radius
+    );
+    group.add(sphere1);
+    
+    // Strand 2
+    const sphere2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08, 16, 16),
+      new THREE.MeshStandardMaterial({
+        color: 0xff5ca7,
+        metalness: 0.7,
+        roughness: 0.2,
+        emissive: 0xff5ca7,
+        emissiveIntensity: 0.4
+      })
+    );
+    sphere2.position.set(
+      Math.cos(t + Math.PI) * radius,
+      y,
+      Math.sin(t + Math.PI) * radius
+    );
+    group.add(sphere2);
+    
+    // Connect strands with lines every few segments
+    if (i % 4 === 0) {
+      const points = [];
+      points.push(sphere1.position.clone());
+      points.push(sphere2.position.clone());
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(
+        lineGeo,
+        new THREE.LineBasicMaterial({ 
+          color: 0x7c5cff, 
+          transparent: true, 
+          opacity: 0.5 
+        })
+      );
+      group.add(line);
+    }
+  }
 
-  // Inner wireframe
-  const wireKnot = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(1.04, 0.36, 80, 18),
-    new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.35 })
+  // Add outer glowing ring
+  const ringGeo = new THREE.TorusGeometry(1.2, 0.02, 16, 100);
+  const ring = new THREE.Mesh(
+    ringGeo,
+    new THREE.MeshBasicMaterial({ 
+      color: 0x7c5cff, 
+      transparent: true, 
+      opacity: 0.3 
+    })
   );
-  scene.add(wireKnot);
+  ring.rotation.x = Math.PI / 2;
+  group.add(ring);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-  const p1 = new THREE.PointLight(0x00e5ff, 2.5, 10); p1.position.set(3, 2, 3); scene.add(p1);
-  const p2 = new THREE.PointLight(0xff5ca7, 2.0, 10); p2.position.set(-3, -2, 2); scene.add(p2);
+  // Add floating particles around helix
+  const particleCount = 30;
+  const particleGeo = new THREE.SphereGeometry(0.03, 8, 8);
+  const particles = [];
+  for (let i = 0; i < particleCount; i++) {
+    const particle = new THREE.Mesh(
+      particleGeo,
+      new THREE.MeshBasicMaterial({ 
+        color: [0x00e5ff, 0xff5ca7, 0x7c5cff][i % 3],
+        transparent: true,
+        opacity: 0.6
+      })
+    );
+    const angle = (i / particleCount) * Math.PI * 2;
+    const dist = 1.5 + Math.random() * 0.5;
+    particle.position.set(
+      Math.cos(angle) * dist,
+      (Math.random() - 0.5) * 3,
+      Math.sin(angle) * dist
+    );
+    particle.userData.angle = angle;
+    particle.userData.dist = dist;
+    particle.userData.speed = 0.0005 + Math.random() * 0.001;
+    group.add(particle);
+    particles.push(particle);
+  }
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const p1 = new THREE.PointLight(0x00e5ff, 2.5, 10); 
+  p1.position.set(3, 2, 3); 
+  scene.add(p1);
+  const p2 = new THREE.PointLight(0xff5ca7, 2.0, 10); 
+  p2.position.set(-3, -2, 2); 
+  scene.add(p2);
+
+  // Mouse interaction
+  const mouse = { x: 0, y: 0 };
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  });
 
   const clock = new THREE.Clock();
   function animate() {
     const t = clock.getElapsedTime();
-    knot.rotation.x = t * 0.3;
-    knot.rotation.y = t * 0.4;
-    wireKnot.rotation.x = -t * 0.25;
-    wireKnot.rotation.y = -t * 0.35;
+    
+    // Rotate the entire helix
+    group.rotation.y = t * 0.3;
+    
+    // Rotate the ring independently
+    ring.rotation.z = t * 0.5;
+    
+    // Animate particles orbiting
+    particles.forEach((p, i) => {
+      p.userData.angle += p.userData.speed * 1000;
+      p.position.x = Math.cos(p.userData.angle) * p.userData.dist;
+      p.position.z = Math.sin(p.userData.angle) * p.userData.dist;
+      p.position.y += Math.sin(t * 2 + i) * 0.002;
+    });
+    
+    // Subtle mouse interaction
+    group.rotation.x = mouse.y * 0.3;
+    
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
@@ -434,6 +603,168 @@ VanillaTilt.init(document.querySelectorAll('.tilt'), {
 })();
 
 /* ============================================================
+   SCENE 5 — Projects: Floating geometric shapes background
+   ============================================================ */
+(function projectsScene() {
+  const canvas = document.getElementById('projects-canvas');
+  if (!canvas) return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 15;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  function resize() {
+    const section = document.getElementById('projects');
+    if (!section) return;
+    const w = section.clientWidth;
+    const h = section.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create floating shapes
+  const shapes = [];
+  const geometries = [
+    new THREE.OctahedronGeometry(1),
+    new THREE.TetrahedronGeometry(1),
+    new THREE.BoxGeometry(1.2, 1.2, 1.2),
+    new THREE.TorusGeometry(0.8, 0.3, 16, 100),
+    new THREE.ConeGeometry(0.8, 1.5, 8),
+    new THREE.DodecahedronGeometry(0.9),
+  ];
+
+  const colors = [0x7c5cff, 0x00e5ff, 0xff5ca7, 0xffd700, 0x4ade80];
+
+  for (let i = 0; i < 15; i++) {
+    const geometry = geometries[i % geometries.length];
+    const material = new THREE.MeshPhongMaterial({
+      color: colors[i % colors.length],
+      transparent: true,
+      opacity: 0.15,
+      wireframe: i % 2 === 0,
+      shininess: 100
+    });
+    
+    const mesh = new THREE.Mesh(geometry, material);
+    
+    // Random position
+    mesh.position.set(
+      (Math.random() - 0.5) * 30,
+      (Math.random() - 0.5) * 20,
+      (Math.random() - 0.5) * 15
+    );
+    
+    // Random rotation
+    mesh.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
+    
+    // Store animation data
+    mesh.userData.rotationSpeed = {
+      x: (Math.random() - 0.5) * 0.02,
+      y: (Math.random() - 0.5) * 0.02,
+      z: (Math.random() - 0.5) * 0.02
+    };
+    mesh.userData.floatSpeed = 0.0005 + Math.random() * 0.001;
+    mesh.userData.floatRadius = 1 + Math.random() * 2;
+    mesh.userData.floatPhase = Math.random() * Math.PI * 2;
+    mesh.userData.baseY = mesh.position.y;
+    
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  // Add particles
+  const particleCount = 100;
+  const particleGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  const particleColors = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 40;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+    
+    const color = new THREE.Color(colors[i % colors.length]);
+    particleColors[i * 3] = color.r;
+    particleColors[i * 3 + 1] = color.g;
+    particleColors[i * 3 + 2] = color.b;
+  }
+
+  particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+  const particleMaterial = new THREE.PointsMaterial({
+    size: 0.1,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending
+  });
+
+  const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+  scene.add(particleSystem);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const pointLight1 = new THREE.PointLight(0x00e5ff, 1, 50);
+  pointLight1.position.set(10, 10, 10);
+  scene.add(pointLight1);
+  
+  const pointLight2 = new THREE.PointLight(0xff5ca7, 1, 50);
+  pointLight2.position.set(-10, -10, 5);
+  scene.add(pointLight2);
+
+  // Mouse interaction
+  const mouse = { x: 0, y: 0 };
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  const clock = new THREE.Clock();
+  function animate() {
+    const t = clock.getElapsedTime();
+    
+    // Animate shapes
+    shapes.forEach((shape, i) => {
+      shape.rotation.x += shape.userData.rotationSpeed.x;
+      shape.rotation.y += shape.userData.rotationSpeed.y;
+      shape.rotation.z += shape.userData.rotationSpeed.z;
+      
+      // Float up and down
+      shape.position.y = shape.userData.baseY + 
+        Math.sin(t * shape.userData.floatSpeed * 1000 + shape.userData.floatPhase) * 
+        shape.userData.floatRadius;
+      
+      // Subtle horizontal drift
+      shape.position.x += Math.sin(t * 0.3 + i) * 0.01;
+    });
+    
+    // Rotate particle system
+    particleSystem.rotation.y = t * 0.05;
+    particleSystem.rotation.x = t * 0.03;
+    
+    // Mouse parallax effect
+    camera.position.x += (mouse.x * 2 - camera.position.x) * 0.05;
+    camera.position.y += (mouse.y * 2 - camera.position.y) * 0.05;
+    camera.lookAt(scene.position);
+    
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ============================================================
    Section reveal animations (GSAP)
    ============================================================ */
 gsap.utils.toArray('.section-title').forEach(el => {
@@ -466,6 +797,47 @@ document.querySelectorAll('#navMain .nav-link').forEach(a => {
     const navEl = document.getElementById('navMain');
     if (navEl.classList.contains('show')) {
       new bootstrap.Collapse(navEl).hide();
+    }
+  });
+});
+
+/* ============================================================
+   Scroll to Top Button
+   ============================================================ */
+(function() {
+  const scrollTopBtn = document.getElementById('scroll-top');
+  if (!scrollTopBtn) return;
+
+  // Show/hide button based on scroll position
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      scrollTopBtn.classList.add('show');
+    } else {
+      scrollTopBtn.classList.remove('show');
+    }
+  });
+
+  // Scroll to top with smooth animation
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+})();
+
+/* ============================================================
+   Enhanced Parallax Effects for Sections
+   ============================================================ */
+gsap.utils.toArray('.section').forEach((section, i) => {
+  gsap.to(section, {
+    y: i % 2 === 0 ? -30 : 30,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: 1,
     }
   });
 });
